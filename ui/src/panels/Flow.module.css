@@ -103,5 +103,5 @@
 .routerName { font-family: var(--font-mono, ui-monospace, monospace); font-size: var(--text-xs); }
 .subHead { display: flex; align-items: baseline; flex-wrap: wrap; gap: 2px var(--space-2); margin-top: 4px; font-size: var(--text-xs); color: var(--text-secondary); }
 .subResult { margin-left: auto; font-variant-numeric: tabular-nums; color: var(--foreground); }
-/* The reply written by Qwen 27B (Vela's hard-turn pick) stands out from the usual 9B. */
+/* The reply written by gpt-oss-120B (Vela's hard-turn pick) stands out from the usual 9B. */
 .model[data-big] { flex: none; padding: 0 6px; border-radius: 6px; background: color-mix(in oklab, var(--warning) 16%, transparent); color: var(--foreground); font-weight: 500; }

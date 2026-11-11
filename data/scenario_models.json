@@ -1,63 +1,63 @@
 {
  "v-phone": [
-  "qwen9b",
-  "qwen9b"
+  "gptoss20b",
+  "gptoss20b"
  ],
  "v-sneaker": [
-  "qwen9b",
-  "qwen9b",
-  "qwen9b"
+  "gptoss20b",
+  "gptoss20b",
+  "gptoss20b"
  ],
  "v-mug": [
-  "qwen9b",
-  "qwen9b",
-  "qwen9b"
+  "gptoss20b",
+  "gptoss20b",
+  "gptoss20b"
  ],
  "v-glass": [
-  "qwen9b",
-  "qwen9b"
+  "gptoss20b",
+  "gptoss20b"
  ],
  "i-laptop": [
-  "qwen9b"
+  "gptoss20b"
  ],
  "i-window": [
-  "qwen9b"
+  "gptoss20b"
  ],
  "i-mug": [
-  "qwen9b",
-  "qwen9b",
-  "qwen9b"
+  "gptoss20b",
+  "gptoss20b",
+  "gptoss20b"
  ],
  "i-headphones": [
-  "qwen9b"
+  "gptoss20b"
  ],
  "i-hand": [
-  "qwen9b",
-  "qwen9b"
+  "gptoss20b",
+  "gptoss20b"
  ],
  "i-dark": [
-  "qwen9b",
-  "qwen9b"
+  "gptoss20b",
+  "gptoss20b"
  ],
  "i-three": [
-  "qwen9b",
-  "qwen9b",
-  "qwen9b",
-  "qwen27b",
-  "qwen9b"
+  "gptoss20b",
+  "gptoss20b",
+  "gptoss20b",
+  "gptoss120b",
+  "gptoss20b"
  ],
  "m-jailbreak": [
   null,
   null
  ],
  "m-bottle": [
-  "qwen9b",
-  "qwen9b",
-  "qwen9b"
+  "gptoss20b",
+  "gptoss20b",
+  "gptoss20b"
  ],
  "m-offtopic": [
   null,
-  "qwen9b"
+  "gptoss20b"
  ],
  "m-fake": [
   null,

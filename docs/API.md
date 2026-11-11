@@ -54,7 +54,7 @@ Events (each `data:` is JSON with a `type`):
 
 `detail` by node:
 - `guardrail`: `{"jailbreak": 0.02, "pii": false, "flagged": false}`
-- `router`: `{"chosen": "qwen9b", "candidates": {"qwen9b": 0.81, "qwen27b": 0.19}}`
+- `router`: `{"chosen": "gptoss20b", "candidates": {"gptoss20b": 0.81, "gptoss120b": 0.19}}`
 - `claim`: `{"order": "4411", "product": "phone", "issue": "crack", "part": "screen"}`
 - `policy`: `{"rules": [{"label": "Delivered 2 days ago, window 10 days", "ok": true}, {"label": "Price under review limit", "ok": true}]}`
 - `eligibility` and `image_check`: D3 questions
@@ -68,7 +68,7 @@ Events (each `data:` is JSON with a `type`):
   ```
   `status` per yes/no: `ok | borderline | bad`.
 - `decision`: `{"verdict": "retake", "reasons": ["Blurry"], "rule": "any quality check bad -> retake"}`
-- `reply`: `{"model": "qwen9b", "tokens": 112}`
+- `reply`: `{"model": "gptoss20b", "tokens": 112}`
 
 `message.order` (null until an order number is known): `{"order", "product", "item", "price", "delivered_days_ago"}`.
 `message.policy_ref`: which part of that product's policy the reply rests on, for the policy popover:
@@ -81,15 +81,15 @@ need_problem | closed` (closed = the claim was decided in an earlier turn).
 Stats of ONE chat session (the top bar is per chat; a new chat or a newly played sample starts from zero). The
 `stats` SSE event carries the same object for the session of that request.
 ```json
-{"session": "s-123", "turns": 3, "d3_calls": 2, "d3_ms_median": 290, "share": {"qwen9b": 1.0, "qwen27b": 0.0},
+{"session": "s-123", "turns": 3, "d3_calls": 2, "d3_ms_median": 290, "share": {"gptoss20b": 1.0, "gptoss120b": 0.0},
  "blocked": 0, "image_checks_avoided": 0,
  "model_seconds": {"routed": 1.9, "baseline_27b": 3.1},
  "tokens": {"routed": 1300, "baseline_27b": 6800, "d3": 9100, "note": "..."},
  "usd_per_million_chats": {"routed": 1055, "baseline_27b": 1722}, "gpu_usd_per_hour": 2.0,
  "baseline": {"correct": 25, "turns": 30, "measured": "2026-10-26 09:10"}}
 ```
-`baseline_27b` = what Qwen 27B alone took for the same turns (measured per sample turn by bench/baseline_27b.py;
-the per-turn average for free-typed turns). `tokens.routed` counts Qwen tokens only; `tokens.d3` is D3's (mostly
+`baseline_27b` = what gpt-oss-120B alone took for the same turns (measured per sample turn by bench/baseline_27b.py;
+the per-turn average for free-typed turns). `tokens.routed` counts gpt-oss tokens only; `tokens.d3` is D3's (mostly
 image) tokens. `image_checks_avoided` is 0 or 1 per chat. There is no `chats` field any more.
 
 ## GET /api/turn/{turn}
@@ -107,7 +107,7 @@ The stored `step` events of a past turn, so clicking an earlier message replays 
   "original"?}`; when the reply claimed an approval that was not given, it is replaced by a fixed fallback and the
   summary says "Replaced: the reply claimed an approval (0.83)". Replies are now checked before they are streamed.
 - Stats: new `off_topic` count per chat (next to `blocked`).
-- On blocked / off-topic turns the `router` step is `skipped` with summary "Vela picked Qwen 9B; not called (fixed
+- On blocked / off-topic turns the `router` step is `skipped` with summary "Vela picked gpt-oss-20B; not called (fixed
   reply)". Stats `share` counts only turns where an LLM wrote the reply (`llm_turns`); null when there were none.
 
 ## Review fixes (2026-10-26, after the code review and exploratory test)
@@ -128,10 +128,10 @@ The stored `step` events of a past turn, so clicking an earlier message replays 
   turn as the text is checked after eligibility and decides the claim directly. A photo sent before the order was
   known is kept and checked once the order is known.
 - `order_match` and `scope_check` details carry their own `ms` (D3 time of that part).
-- Stats: `image_checks_avoided` is now a count of claims closed before any photo check; the all-27B baseline for
+- Stats: `image_checks_avoided` is now a count of claims closed before any photo check; the all-120B baseline for
   free-typed turns uses separate averages for text turns (0.88 s, 1,712 tokens) and photo turns (1.28 s, 3,404).
 
-## Chat ending and 27B marker (2026-10-26)
+## Chat ending and 120B marker (2026-10-26)
 - `message.ended` is null while the chat is open, else `{"reason", "title", "text", "order", "actions"}`:
   `approved` (accepted, no other order waiting), `approved_and_handed_over`, `handed_over` (any hand-over to a person),
   `not_covered` (actions `["review", "new_chat"]`), `blocked` (2nd blocked message in the chat), `off_topic` (3rd
@@ -140,9 +140,9 @@ The stored `step` events of a past turn, so clicking an earlier message replays 
   state change). The only exception: `{"session", "action": "review"}` after `not_covered` hands the case to a person
   (verdict `human`, then `ended.reason` = `handed_over`).
 - /api/samples: each turn has `model` (the LLM that wrote that reply in the last bench/run_scenarios.py run:
-  `qwen9b`, `qwen27b` or null for a fixed reply) and each scenario `uses_27b`.
+  `gptoss20b`, `gptoss120b` or null for a fixed reply) and each scenario `uses_27b`.
 - Samples changed: "Dropped by the customer" is one turn (the chat ends on not covered); "Three unusable photos" has
-  an angry customer turn that Vela routes to Qwen 27B (verdict `info`).
+  an angry customer turn that Vela routes to gpt-oss-120B (verdict `info`).
 
 ## Agreed with the UI build (2026-10-26)
 - Image-only turns send `guardrail`, `claim`, `policy`, `eligibility` as `skipped` with a summary such as

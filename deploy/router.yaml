@@ -3,9 +3,9 @@
 # - d3-mini (Decision 3.0) runs in the Router's model runtime on the GPU and answers on /v1/systemone: order matching,
 #   scope check, eligibility, photo check and reply check.
 # - Vela 2.0 0.8B (vela08) is the Router's decision model: it scores prompt attacks and personal data and picks
-#   qwen9b or qwen27b for each turn of the `returns/auto` entry point. The demo reads these through the Router's
+#   gptoss20b or gptoss120b for each turn of the `returns/auto` entry point. The demo reads these through the Router's
 #   routing preview (management API on 127.0.0.1:8080, published by vllm-sr).
-# - qwen9b and qwen27b are the two vLLM containers started by deploy/serve_qwen.sh; the Router reaches them by
+# - gptoss20b and gptoss120b are the two vLLM containers started by deploy/serve_gptoss.sh; the Router reaches them by
 #   container name on the vllm-sr-network Docker network. The demo also calls them by these names directly.
 # - The listener binds 127.0.0.1 only. Open the demo page from a laptop through an SSH tunnel (see README.md).
 version: v0.3
@@ -39,16 +39,16 @@ entrypoints:
 
 providers:
   defaults:
-    model: qwen9b
+    model: gptoss20b
   models:
-    - name: qwen9b
-      provider_model_id: qwen9b
+    - name: gptoss20b
+      provider_model_id: gptoss20b
       backend_refs:
-        - {name: primary, provider: vllm, endpoint: "prv-qwen9b:8000", protocol: http}
-    - name: qwen27b
-      provider_model_id: qwen27b
+        - {name: primary, provider: vllm, endpoint: "prv-gptoss20b:8000", protocol: http}
+    - name: gptoss120b
+      provider_model_id: gptoss120b
       backend_refs:
-        - {name: primary, provider: vllm, endpoint: "prv-qwen27b:8000", protocol: http}
+        - {name: primary, provider: vllm, endpoint: "prv-gptoss120b:8000", protocol: http}
 
 # Default recipe (any other model name): a plain pass-through to the 9B. The demo only uses returns/auto and the
 # concrete model names.
@@ -58,7 +58,7 @@ routing:
       priority: 100
       rules: {operator: AND, conditions: []}
       modelRefs:
-        - model: qwen9b
+        - model: gptoss20b
 
 recipes:
   - name: returns
@@ -98,28 +98,28 @@ recipes:
             conditions:
               - {type: pii, name: customer_pii}
           modelRefs:
-            - model: qwen27b
-            - model: qwen9b
+            - model: gptoss120b
+            - model: gptoss20b
           algorithm:
             type: decision
             decision:
               instructions: Which model should answer this customer-service turn about a return?
               candidates:
-                qwen9b: Medium model for normal customer-service turns, such as return status, eligibility questions, return labels, refund timing and simple follow-ups
-                qwen27b: Large model for disputes, several issues in one turn, an angry or upset customer, or a customer arguing about the returns policy
+                gptoss20b: Medium model for normal customer-service turns, such as return status, eligibility questions, return labels, refund timing and simple follow-ups
+                gptoss120b: Large model for disputes, several issues in one turn, an angry or upset customer, or a customer arguing about the returns policy
               timeout_ms: 1000
         - name: returns-tiered
           description: Ordinary returns turn.
           priority: 100
           rules: {operator: AND, conditions: []}
           modelRefs:
-            - model: qwen27b
-            - model: qwen9b
+            - model: gptoss120b
+            - model: gptoss20b
           algorithm:
             type: decision
             decision:
               instructions: Which model should answer this customer-service turn about a return?
               candidates:
-                qwen9b: Medium model for normal customer-service turns, such as return status, eligibility questions, return labels, refund timing and simple follow-ups
-                qwen27b: Large model for disputes, several issues in one turn, an angry or upset customer, or a customer arguing about the returns policy
+                gptoss20b: Medium model for normal customer-service turns, such as return status, eligibility questions, return labels, refund timing and simple follow-ups
+                gptoss120b: Large model for disputes, several issues in one turn, an angry or upset customer, or a customer arguing about the returns policy
               timeout_ms: 1000

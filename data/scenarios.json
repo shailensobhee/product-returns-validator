@@ -173,7 +173,7 @@
     {
      "id": "i-three",
      "title": "Three unusable photos",
-     "subtitle": "Blurry, dark, an angry customer (Qwen 27B), then a person",
+     "subtitle": "Blurry, dark, an angry customer (gpt-oss-120B), then a person",
      "order": "4411",
      "turns": [
       {

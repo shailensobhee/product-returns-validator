@@ -44,5 +44,5 @@
 .result[data-ok="false"] { color: var(--danger); }
 .foot { display: flex; gap: var(--space-2); padding: var(--space-3) var(--space-4) var(--space-4); border-top: 1px solid var(--border); }
 .foot > :first-child { flex: 1; }
-/* Quiet marker: a turn of this chat goes to Qwen 27B. */
+/* Quiet marker: a turn of this chat goes to gpt-oss-120B. */
 .b27 { flex: none; align-self: center; padding: 0 5px; border: 1px solid var(--border-strong); border-radius: 6px; font-size: 11px; line-height: 16px; font-weight: 500; color: var(--text-secondary); font-variant-numeric: tabular-nums; }

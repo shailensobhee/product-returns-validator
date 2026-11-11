@@ -1,6 +1,6 @@
-"""Phase 3 baseline: Qwen 27B alone runs the returns chat (no Router guardrails, no Vela, no D3).
+"""Phase 3 baseline: gpt-oss-120B alone runs the returns chat (no Router guardrails, no Vela, no D3).
 
-For every turn of data/scenarios.json, one 27B call gets the policies, the orders, the chat so far and the photo (if
+For every turn of data/scenarios.json, one 120B call gets the policies, the orders, the chat so far and the photo (if
 any) and returns JSON {verdict, reply}. Records time, tokens and whether the verdict matches the expected one.
 Writes data/baseline_27b.json (read by the server for the top-bar comparison) and results/baseline_27b.jsonl.
 """
@@ -44,7 +44,7 @@ SCHEMA = {"type": "object", "properties": {"verdict": {"type": "string", "enum":
 
 
 def call(history):
-    body = {"model": "qwen27b", "temperature": 0, "max_tokens": 300, "chat_template_kwargs": {"enable_thinking": False},
+    body = {"model": "gptoss120b", "temperature": 0, "max_tokens": 300, "chat_template_kwargs": {"enable_thinking": False},
             "response_format": {"type": "json_schema", "json_schema": {"name": "out", "schema": SCHEMA}},
             "messages": [{"role": "system", "content": SYSTEM}] + history}
     t = time.perf_counter()
@@ -91,7 +91,7 @@ def main():
                # keyed by the turn's text or image, so the server can match a sample turn in any session
                "by_input": {r["input"]: {"ms": r["ms"], "tokens": r["tokens"]} for r in rows},
                "measured": time.strftime("%Y-%m-%d %H:%M"),
-               # per kind of turn, for free-typed turns: text-only turns are much cheaper for the 27B than photo turns
+               # per kind of turn, for free-typed turns: text-only turns are much cheaper for the 120B than photo turns
                "avg": {k: {"ms": round(sum(r["ms"] for r in rs) / len(rs), 1),
                            "tokens": round(sum(r["tokens"] for r in rs) / len(rs)), "n": len(rs)}
                        for k, rs in (("text", [r for r in rows if not r["image"]]), ("image", [r for r in rows if r["image"]]))}}

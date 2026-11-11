@@ -1,4 +1,4 @@
-"""Model calls: D3 (System One API) and Qwen (chat completions), both through the vllm-sr Router on :8899."""
+"""Model calls: D3 (System One API) and gpt-oss (chat completions), both through the vllm-sr Router on :8899."""
 import base64
 import os
 import io
@@ -68,7 +68,7 @@ def image_url(image):
 def chat(model, messages, max_tokens=300, schema=None, timeout=(3, 120)):
     """Non-streaming call. Returns (text, ms, tokens)."""
     body = {"model": model, "messages": messages, "max_tokens": max_tokens, "temperature": 0,
-            "chat_template_kwargs": {"enable_thinking": False}}
+            "reasoning_effort": "low"}
     if schema:
         body["response_format"] = {"type": "json_schema", "json_schema": {"name": "out", "schema": schema}}
     t = time.perf_counter()
@@ -82,7 +82,7 @@ def chat(model, messages, max_tokens=300, schema=None, timeout=(3, 120)):
 def chat_stream(model, messages, max_tokens=300, timeout=(3, 120)):
     """Streaming call. Yields ("token", text) and finally ("done", {"ms", "tokens", "text"})."""
     body = {"model": model, "messages": messages, "max_tokens": max_tokens, "temperature": 0.3, "stream": True,
-            "stream_options": {"include_usage": True}, "chat_template_kwargs": {"enable_thinking": False}}
+            "stream_options": {"include_usage": True}, "reasoning_effort": "low"}
     t = time.perf_counter()
     text, tokens = [], 0
     with requests.post(f"{ROUTER_URL}/v1/chat/completions", json=body, timeout=timeout, stream=True) as r:

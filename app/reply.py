@@ -1,4 +1,4 @@
-"""The customer-facing reply. Qwen (9B or 27B, chosen per turn) words the decision; it never makes or changes it."""
+"""The customer-facing reply. gpt-oss (20B or 120B, chosen per turn) words the decision; it never makes or changes it."""
 from claim import POLICIES
 
 SYSTEM = """You are the returns assistant of an online shop, chatting with a customer.

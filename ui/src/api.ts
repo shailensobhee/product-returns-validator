@@ -5,10 +5,10 @@ export type Verdict =
   | "need_problem" | "closed" | "off_topic" | "info" | "bad_file" | "error" | "ended";
 
 /** `model`: the LLM that wrote this turn's reply in the last bench run (null for a fixed reply). */
-export interface Turn { text?: string; image?: string; expect?: Verdict; model?: "qwen9b" | "qwen27b" | null }
+export interface Turn { text?: string; image?: string; expect?: Verdict; model?: "gptoss20b" | "gptoss120b" | null }
 export interface Scenario {
   id: string; title: string; subtitle?: string; order?: string | null; product?: string | null; expected: Verdict; turns: Turn[];
-  /** Vela routed a turn of this chat to Qwen 27B in the last bench run. */
+  /** Vela routed a turn of this chat to gpt-oss-120B in the last bench run. */
   uses_27b?: boolean;
 }
 export interface Group { key: string; title: string; scenarios: Scenario[] }
@@ -20,7 +20,7 @@ export interface Samples { groups: Group[]; policies: Policies }
 /** message.order: the order the conversation is about, once its number is known. */
 export interface OrderInfo { order: string; product: string; item?: string; price?: number; delivered_days_ago?: number }
 export type PolicyRef = "covered" | "not_covered" | "window" | "review_limit" | "photo";
-/** message.ended: null while the chat is open (docs/API.md "Chat ending and 27B marker"). */
+/** message.ended: null while the chat is open (docs/API.md "Chat ending and big-model (120B) marker"). */
 export type EndReason = "approved" | "approved_and_handed_over" | "handed_over" | "not_covered" | "blocked" | "off_topic";
 export interface Ended { reason: EndReason | string; title: string; text: string; order?: string | null; actions: ("review" | "new_chat" | string)[] }
 export interface GalleryItem { path: string; product: string; case: string }
@@ -71,7 +71,7 @@ export interface StepEvent {
 /** Stats of one chat session (GET /api/stats?session=<id> and the `stats` SSE event). */
 export interface Stats {
   session?: string; turns?: number; d3_calls?: number; d3_ms_median?: number | null;
-  share?: { qwen9b?: number; qwen27b?: number } | null;
+  share?: { gptoss20b?: number; gptoss120b?: number } | null;
   blocked?: number; off_topic?: number; image_checks_avoided?: number;
   model_seconds?: { routed: number | null; baseline_27b: number | null };
   tokens?: { routed: number | null; baseline_27b: number | null; d3?: number; note?: string };

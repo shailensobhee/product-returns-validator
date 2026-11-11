@@ -1,7 +1,7 @@
-"""Per-turn checks before the claim flow: the guardrail and the 9B / 27B choice.
+"""Per-turn checks before the claim flow: the guardrail and the 20B / 120B choice.
 
 Main path: one Router routing preview for `returns/auto` (recipe `returns` in deploy/router.yaml):
-Vela 2.0 scores prompt attacks (blocks at 0.75) and PII (flag only) and picks qwen9b or qwen27b. The preview returns
+Vela 2.0 scores prompt attacks (blocks at 0.75) and PII (flag only) and picks gptoss20b or gptoss120b. The preview returns
 the scores, which a chat response does not. When the Router blocks, d3-mini decides whether the message also holds a
 real complaint: then the instruction is ignored and the complaint handled. If the preview fails, the d3-mini
 fallbacks below take over.
@@ -144,9 +144,9 @@ def guardrail(text):
 
 ROUTE_STATE = "Returns chat. Customer's latest message:\n\"{text}\"\nState of the claim: {stage}."
 ROUTE_Q = {"model": {"type": "choice", "instructions": "Which assistant should answer this turn?",
-                     "criteria": {"qwen9b": "A normal customer-service turn: a greeting, an order number, a short "
+                     "criteria": {"gptoss20b": "A normal customer-service turn: a greeting, an order number, a short "
                                             "description of a problem, a photo, or a simple question",
-                                  "qwen27b": "A hard turn: the customer disputes a decision, argues about the policy, is "
+                                  "gptoss120b": "A hard turn: the customer disputes a decision, argues about the policy, is "
                                              "upset, reports several problems at once, or writes a long or confusing "
                                              "message"}}}
 

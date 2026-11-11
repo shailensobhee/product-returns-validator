@@ -1,6 +1,6 @@
 #!/bin/bash
 # Downloads the demo's models (resumable; run again after an interruption):
-#   Qwen/Qwen3.8-27B (~52 GB) and Qwen/Qwen3.5-9B (~19 GB) into the Hugging Face cache, read by deploy/serve_qwen.sh
+#   openai/gpt-oss-120b (~63 GB) and openai/gpt-oss-20b (~13 GB) into the Hugging Face cache, read by deploy/serve_gptoss.sh
 #   vllm-sr/d3-mini (~8.5 GB) and vllm-sr/Vela-2.0-0.8B (~2 GB) into deploy/models/model-runtime, the cache the
 #     Router's model runtime reads (the Router downloads them there itself on first start if they are missing;
 #     fetching them here just makes that start quicker)
@@ -20,7 +20,7 @@ if [ -z "$HF" ]; then
 fi
 [ -n "$HF" ] || { echo "the hf CLI is missing: .venv/bin/pip install -r requirements.txt" >&2; exit 1; }
 
-for m in Qwen/Qwen3.8-27B Qwen/Qwen3.5-9B; do
+for m in openai/gpt-oss-120b openai/gpt-oss-20b; do
   echo "== $m -> $HF_HOME/hub"
   "$HF" download "$m"
 done

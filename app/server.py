@@ -34,7 +34,7 @@ HOST = os.environ.get("HOST", "127.0.0.1")
 GPU_USD_PER_HOUR = float(os.environ.get("GPU_USD_PER_HOUR", "2.59"))
 BASELINE = (json.loads((ROOT / "data/baseline_27b.json").read_text())
             if (ROOT / "data/baseline_27b.json").exists() else None)
-# which LLM answered each sample turn in the last bench/run_scenarios.py run (Vela's choice), for the "27B" marker
+# which LLM answered each sample turn in the last bench/run_scenarios.py run (Vela's choice), for the "120B" marker
 MODELS = (json.loads((ROOT / "data/scenario_models.json").read_text())
           if (ROOT / "data/scenario_models.json").exists() else {})
 CASES = ["note_screen", "cut_off", "clear", "blurry", "dark", "glare", "intact", "hand", "finger", "note"]
@@ -45,7 +45,7 @@ class SessionStats:
     def __init__(self):
         self.calls = []            # (kind, ms, tokens) of every model call
         self.reply_models = []     # model per turn
-        self.baseline = []         # (seconds, tokens) of the all-27B run for each turn
+        self.baseline = []         # (seconds, tokens) of the all-120B run for each turn
         self.blocked = 0
         self.off_topic = 0
         self.avoided = 0           # claims closed before any photo check
@@ -55,14 +55,14 @@ class SessionStats:
         n = len(self.reply_models)
         llm = [m for m in self.reply_models if m]
         seconds = sum(ms for _k, ms, _t in self.calls) / 1000
-        llm_tokens = sum(t for k, _ms, t in self.calls if k.startswith("qwen"))
+        llm_tokens = sum(t for k, _ms, t in self.calls if k.startswith("gptoss"))
         d3_tokens = sum(t for k, _ms, t in self.calls if k == "d3")
         b_seconds = sum(x for x, _ in self.baseline) if n else None
         b_tokens = sum(t for _, t in self.baseline) if n else None
         usd = lambda secs: round(secs / 3600 * GPU_USD_PER_HOUR * 1e6) if secs else None
         return {"turns": n, "d3_calls": len(d3), "d3_ms_median": round(statistics.median(d3)) if d3 else None,
                 # share of the turns where an LLM actually wrote the reply
-                "share": {m: round(llm.count(m) / len(llm), 3) for m in ("qwen9b", "qwen27b")} if llm else None,
+                "share": {m: round(llm.count(m) / len(llm), 3) for m in ("gptoss20b", "gptoss120b")} if llm else None,
                 "llm_turns": len(llm),
                 "blocked": self.blocked, "off_topic": self.off_topic, "image_checks_avoided": self.avoided,
                 "model_seconds": {"routed": round(seconds, 2), "baseline_27b": round(b_seconds, 2) if n else None},
@@ -75,7 +75,7 @@ class SessionStats:
 
 
 def baseline_turn(text, image):
-    """All-27B time and tokens for this turn: the measured value when it is a sample turn, else the measured average
+    """All-120B time and tokens for this turn: the measured value when it is a sample turn, else the measured average
     for that kind of turn (text only, or with a photo)."""
     if not BASELINE:
         return 0.0, 0
@@ -117,8 +117,8 @@ def health():
             raise RuntimeError(f"returns/auto is not configured (decision {pv['decision']!r}); see deploy/router.yaml")
     probe("vela_routing", preview)
     probe("d3", lambda: d3("health check", {"q": {"type": "noul", "instructions": "This is a test."}}, timeout=(3, 20)))
-    probe("qwen9b", lambda: chat("qwen9b", [{"role": "user", "content": "Say OK."}], max_tokens=2, timeout=(3, 30)))
-    probe("qwen27b", lambda: chat("qwen27b", [{"role": "user", "content": "Say OK."}], max_tokens=2, timeout=(3, 60)))
+    probe("gptoss20b", lambda: chat("gptoss20b", [{"role": "user", "content": "Say OK."}], max_tokens=2, timeout=(3, 30)))
+    probe("gptoss120b", lambda: chat("gptoss120b", [{"role": "user", "content": "Say OK."}], max_tokens=2, timeout=(3, 60)))
     value = {"ok": all(parts.values()), **parts, "detail": detail}
     _health.update(at=time.time(), value=value)
     return value
@@ -152,7 +152,7 @@ class State:
                 return
             st.calls += done["calls"]
             # the model that wrote the reply; None when the turn got a fixed reply (blocked, off-topic): no LLM ran
-            st.reply_models.append(next((k for k, _ms, _t in reversed(done["calls"]) if k.startswith("qwen")), None))
+            st.reply_models.append(next((k for k, _ms, _t in reversed(done["calls"]) if k.startswith("gptoss")), None))
             st.baseline.append(baseline_turn(text, image))
             st.blocked += verdict == "blocked"
             st.off_topic += verdict == "off_topic"
@@ -172,7 +172,7 @@ def samples():
             used = MODELS.get(sc["id"], [])
             for i, t in enumerate(sc["turns"]):
                 t["model"] = used[i] if i < len(used) else None
-            sc["uses_27b"] = "qwen27b" in used
+            sc["uses_27b"] = "gptoss120b" in used
             sc["expected"] = sc.get("expected") or next(t["expect"] for t in reversed(sc["turns"]) if t["expect"] != "closed")
     data["policies"] = claim.POLICIES
     return data

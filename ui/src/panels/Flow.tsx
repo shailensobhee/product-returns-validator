@@ -25,7 +25,7 @@ const STATUS_TEXT = { waiting: "Waiting", running: "Running", done: "Done", skip
 /** Vela's pick: the chosen model as one line and the Vela decision name small. No pick (guard decision): the summary says it. */
 function RouterView({ d }: { d: RouterDetail }) {
   if (!d.chosen) return null;
-  const hard = d.chosen === "qwen27b";
+  const hard = d.chosen === "gptoss120b";
   return (
     <div className={styles.router}>
       <p className={styles.routerPick}>{modelName(d.chosen)} <span className={styles.routerWhy}>({hard ? "hard turn" : "normal turn"})</span></p>
@@ -190,7 +190,7 @@ function Node({ node, step, last }: { node: NodeKey; step: StepEvent | undefined
   const [open, setOpen] = useState(true);
   const verdictShown = node === "decision" && !!(step?.detail as DecisionDetail | undefined)?.verdict && step?.status === "done";
   // A replaced reply says so in its warning block (with the original), so the summary line is not repeated.
-  // A router that picked a model shows the pick as its own line, so the summary ("Normal turn, Qwen 9B") is not repeated.
+  // A router that picked a model shows the pick as its own line, so the summary ("Normal turn, gpt-oss-20B") is not repeated.
   const routerPick = node === "router" && status === "done" && !!(step?.detail as RouterDetail | undefined)?.chosen;
   const summary = verdictShown || replaced || routerPick ? "" : step?.summary || (status === "skipped" ? "Not needed" : status === "waiting" || !step ? NODE_HINT[node] : "");
   const hasDetail = !!step?.detail && (step.status === "done" || step.status === "blocked" || step.status === "failed") && (!isD3 || (hasQuestions && open));
@@ -209,7 +209,7 @@ function Node({ node, step, last }: { node: NodeKey; step: StepEvent | undefined
       <div className={styles.body}>
         <div className={styles.headRow}>
           <h3 className={styles.name}>{NODE_LABEL[node]}{usesD3 && <span className={styles.d3}>D3</span>}</h3>
-          {model && <span className={styles.model} data-big={(node === "reply" && /qwen27b/.test(step?.model ?? "")) || undefined}>{model}</span>}
+          {model && <span className={styles.model} data-big={(node === "reply" && /gptoss120b/.test(step?.model ?? "")) || undefined}>{model}</span>}
           {skipped && <span className={styles.inlineSkip}><span className={styles.skipTag}>Skipped</span>{summary}</span>}
           <span className={styles.ms}>{step?.ms != null && !skipped ? fmtMs(step.ms) : ""}</span>
           <span className={styles.srOnly}>{STATUS_TEXT[status]}</span>
@@ -242,7 +242,7 @@ function Node({ node, step, last }: { node: NodeKey; step: StepEvent | undefined
 /** D3 time this turn (docs/UI.md "D3 time in the flow header"): steps run by D3 alone (model contains "d3", e.g. eligibility,
  * photo check; for the guardrail only its D3 scope check, `scope_check.ms`), the
  * order match inside the claim step when the server times it (`order_match.ms`), and the reply check (`reply_check.ms`).
- * The claim and reply steps themselves are Qwen time and are not counted. */
+ * The claim and reply steps themselves are gpt-oss time and are not counted. */
 function d3Ms(steps: StepEvent[]): number {
   let ms = 0;
   for (const s of steps) {

@@ -38,7 +38,7 @@ export const NODE_LABEL: Record<NodeKey, string> = {
 /** What each node is, shown under the name while it waits. */
 export const NODE_HINT: Record<NodeKey, string> = {
   guardrail: "Vela jailbreak screen and D3 scope check on the message",
-  router: "Vela picks Qwen 9B or Qwen 27B for this turn",
+  router: "Vela picks gpt-oss-20B or gpt-oss-120B for this turn",
   claim: "Order, item, issue and part as JSON",
   policy: "Return window, delivery and price limit, in code",
   eligibility: "D3 text decision over the policy and complaint",
@@ -49,11 +49,11 @@ export const NODE_HINT: Record<NodeKey, string> = {
 export const D3_NODES: NodeKey[] = ["eligibility", "image_check"];
 
 const MODEL_NAME: Record<string, string> = {
-  qwen9b: "Qwen 9B", qwen27b: "Qwen 27B", "vllm-sr/d3-mini": "D3 mini", "vllm-sr/d3-flash": "D3 flash", "vllm-sr/d3-lite": "D3 lite",
+  gptoss20b: "gpt-oss-20B", gptoss120b: "gpt-oss-120B", "vllm-sr/d3-mini": "D3 mini", "vllm-sr/d3-flash": "D3 flash", "vllm-sr/d3-lite": "D3 lite",
   "vllm-sr/d3-edge": "D3 edge", "vllm-sr/vela": "Vela", "Vela 2.0 (vllm-sr)": "Vela 2.0", "vllm-sr/guardrail": "Guardrail",
 };
 const oneModel = (m: string) => MODEL_NAME[m] || m.replace(/^vllm-sr\//, "");
-/** "qwen9b + vllm-sr/d3-mini" -> "Qwen 9B + D3 mini". */
+/** "gptoss20b + vllm-sr/d3-mini" -> "gpt-oss-20B + D3 mini". */
 export const modelName = (m: string | undefined) => (m ? m.split(/\s*\+\s*/).map(oneModel).join(" + ") : "");
 
 export const DASH = "–";

@@ -34,7 +34,7 @@ export interface Replay { turn: string; msgId: string; steps: Flow | null; error
 export interface Playing { scenario: Scenario; group: string; turn: number; all: boolean }
 /** Actual verdict of every turn of a finished scenario run. */
 export type Outcomes = Record<string, (Verdict | undefined)[]>;
-/** Per scenario: did a reply step of the last run use Qwen 27B (Vela decides live, so this can differ from `uses_27b`). */
+/** Per scenario: did a reply step of the last run use gpt-oss-120B (Vela decides live, so this can differ from `uses_27b`). */
 export type Used27 = Record<string, boolean>;
 /** Matched only when every turn's verdict equals that turn's `expect`. */
 export const matches = (sc: Scenario, got: (Verdict | undefined)[]) => sc.turns.every((t, i) => !t.expect || got[i] === t.expect);
@@ -138,7 +138,7 @@ export function useDemo() {
       await streamChat({ session: sid, ...input }, (e) => {
         switch (e.type) {
           case "step":
-            if (e.node === "reply" && e.status !== "skipped" && /qwen27b/.test(`${e.model ?? ""} ${(e.detail as { model?: string } | null)?.model ?? ""}`)) used27Ref.current = true;
+            if (e.node === "reply" && e.status !== "skipped" && /gptoss120b/.test(`${e.model ?? ""} ${(e.detail as { model?: string } | null)?.model ?? ""}`)) used27Ref.current = true;
             setFlow((f) => ({ ...f, [e.node]: { ...f[e.node], ...e } }));
             break;
           case "token": patch(aid, (m) => ({ text: (m.text ?? "") + e.text })); break;

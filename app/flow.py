@@ -162,16 +162,16 @@ class Session:
                        "Vela 2.0 + D3 mini" if pv else "D3 mini", (pv_ms if pv else 0) + sms, gdetail)
 
         fixed = verdict in ("blocked", "off_topic", "bad_file")
-        if pv and pv["model"] in ("qwen9b", "qwen27b"):
+        if pv and pv["model"] in ("gptoss20b", "gptoss120b"):
             model = pv["model"]
-            picked = f"{'Hard' if model == 'qwen27b' else 'Normal'} turn, {model_name(model)}"
+            picked = f"{'Hard' if model == 'gptoss120b' else 'Normal'} turn, {model_name(model)}"
             rdetail = {"chosen": model, "router_decision": pv["decision"], "reason": pv["reason"]}
         elif pv:
-            model = "qwen9b"
-            picked = "Vela picked no model (guard decision); Qwen 9B by default"
+            model = "gptoss20b"
+            picked = "Vela picked no model (guard decision); gpt-oss-20B by default"
             rdetail = {"chosen": None, "router_decision": pv["decision"], "reason": pv["reason"]}
         elif fixed:  # Router down and nothing for a model to do
-            model, rdetail = "qwen9b", {"chosen": None}
+            model, rdetail = "gptoss20b", {"chosen": None}
         else:  # Router down: d3-mini picks
             model, rdetail, rms, rtok = turn_checks.route(text, self.claim.stage.replace("_", " ") if self.claim else "new chat")
             calls.append(("d3", rms, rtok))
@@ -392,9 +392,9 @@ class Session:
         new_problem = False
         # 3. claim: which order, and is there problem text
         if text:
-            yield step("claim", "running", None, "qwen9b")
+            yield step("claim", "running", None, "gptoss20b")
             d, ms, tok = claim.extract(text)
-            calls.append(("qwen9b", ms, tok))
+            calls.append(("gptoss20b", ms, tok))
             named = [n for n in re.findall(r"\b\d{4,6}\b", text)]
             if d.get("order") and d["order"] not in named:
                 named.insert(0, d["order"])
@@ -458,7 +458,7 @@ class Session:
             summary = (f"Order {c.order['order']}: {c.order['item']}{how}" if c else
                        f"Order {ctx['not_found']} is not on this account" if ctx.get("not_found") else
                        "Which order? " + ctx["options"] if ctx.get("options") else "No order yet")
-            yield step("claim", "done", summary, "qwen9b + vllm-sr/d3-mini" if "order_match" in detail else "qwen9b",
+            yield step("claim", "done", summary, "gptoss20b + vllm-sr/d3-mini" if "order_match" in detail else "gptoss20b",
                        ms, detail)
         else:
             if c and c.final and self.queued:
@@ -612,7 +612,7 @@ def policy_ref(verdict, ctx, c=None):
 
 
 def model_name(m):
-    return {"qwen9b": "Qwen 9B", "qwen27b": "Qwen 27B"}.get(m, m)
+    return {"gptoss20b": "gpt-oss-20B", "gptoss120b": "gpt-oss-120B"}.get(m, m)
 
 
 END = {

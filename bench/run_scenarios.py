@@ -14,7 +14,7 @@ from flow import Session  # noqa: E402
 groups = json.loads((ROOT / "data/scenarios.json").read_text())["groups"]
 want = set(sys.argv[1:])
 bad = total = 0
-models = {}   # scenario id -> the LLM that wrote each reply (None: fixed reply), for the "27B" marker
+models = {}   # scenario id -> the LLM that wrote each reply (None: fixed reply), for the "120B" marker
 for g in groups:
     print(f"\n## {g['title']}")
     for sc in g["scenarios"]:
@@ -45,5 +45,5 @@ for g in groups:
 print(f"\n{total - bad}/{total} turns as expected")
 if not want:
     (ROOT / "data/scenario_models.json").write_text(json.dumps(models, indent=1))
-    print("27B used in:", [k for k, v in models.items() if "qwen27b" in v])
+    print("27B used in:", [k for k, v in models.items() if "gptoss120b" in v])
 sys.exit(1 if bad else 0)

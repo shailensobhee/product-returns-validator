@@ -1,6 +1,6 @@
 #!/bin/bash
 # Stops what deploy/up.sh started (listed in deploy/.state), and nothing else: services that were already running
-# when up.sh ran are left alone. --all also stops the parts up.sh did not start (prv-qwen27b, prv-qwen9b, the Router).
+# when up.sh ran are left alone. --all also stops the parts up.sh did not start (prv-gptoss120b, prv-gptoss20b, the Router).
 set -uo pipefail
 cd "$(dirname "$0")/.."
 source deploy/common.sh
@@ -19,7 +19,7 @@ fi
 if had router; then
   (cd deploy && "${SR[@]}" stop) && echo "stopped the Router" || echo "Router stop failed (see above)"
 fi
-for n in qwen27b qwen9b; do
+for n in gptoss120b gptoss20b; do
   if had "$n"; then
     $DOCKER rm -f "prv-$n" >/dev/null 2>&1 && echo "stopped prv-$n" || echo "prv-$n was not running"
   fi
